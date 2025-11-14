@@ -4,9 +4,9 @@
 
 ### Via pacman
 Append this to the end of /etc/pacman.conf file:<br>
-`[sololinux-hyprland]
+```[sololinux-hyprland]
 SigLevel = Optional TrustAll
-Server = https://solomon-dbw.github.io/SoloLinux-Package-Repo/x86_64`
+Server = https://solomon-dbw.github.io/SoloLinux-Package-Repo/x86_64```
 
 Run `sudo pacman -Sy` to update pacman database.
 Run `sudo pacman -S sololinux-hyprland` to install package
