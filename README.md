@@ -3,7 +3,7 @@
 ## Install SoloLinux GUI config
 
 ### Via pacman
-Append this to the end of /etc/pacman.conf file:
+Append this to the end of /etc/pacman.conf file:<br>
 `[sololinux-hyprland]
 SigLevel = Optional TrustAll
 Server = https://solomon-dbw.github.io/SoloLinux-Package-Repo/x86_64`
