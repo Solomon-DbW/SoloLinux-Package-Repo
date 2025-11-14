@@ -1,0 +1,245 @@
+#!/bin/bash
+
+post_install() {
+    echo "==> Setting up SoloLinux Hyprland configuration..."
+    
+    # Backup original os-release if it exists and hasn't been backed up
+    if [ -f /etc/os-release.pacsave ]; then
+        echo "    Original os-release already backed up at /etc/os-release.pacsave"
+    fi
+    
+    # Configure GRUB theme (only if GRUB is installed)
+    if [ -f /etc/default/grub ] && [ -d /usr/share/grub/themes/SoloLinux_grub ]; then
+        echo "==> Configuring GRUB theme..."
+        
+        # Backup GRUB config if not already backed up
+        if [ ! -f /etc/default/grub.bak ]; then
+            cp /etc/default/grub /etc/default/grub.bak
+            echo "    GRUB config backed up to /etc/default/grub.bak"
+        fi
+        
+        # Check if theme line already exists
+        if ! grep -q "GRUB_THEME=" /etc/default/grub; then
+            echo 'GRUB_THEME="/usr/share/grub/themes/SoloLinux_grub/theme.txt"' >> /etc/default/grub
+            echo "    GRUB theme configured"
+        else
+            # Update existing theme line
+            sed -i 's|^GRUB_THEME=.*|GRUB_THEME="/usr/share/grub/themes/SoloLinux_grub/theme.txt"|' /etc/default/grub
+            echo "    GRUB theme updated"
+        fi
+        
+        # Regenerate GRUB config
+        if command -v grub-mkconfig &> /dev/null; then
+            echo "    Regenerating GRUB configuration..."
+            grub-mkconfig -o /boot/grub/grub.cfg
+            echo "    GRUB configuration updated"
+        fi
+    elif [ ! -f /etc/default/grub ]; then
+        echo "==> GRUB not detected - skipping GRUB theme configuration"
+        echo "    (GRUB theme available at /usr/share/grub/themes/SoloLinux_grub if needed)"
+    fi
+    
+    # Enable necessary services
+    echo "==> Enabling system services..."
+    
+    if command -v systemctl &> /dev/null; then
+        # Enable NetworkManager if not already enabled
+        if ! systemctl is-enabled NetworkManager.service &> /dev/null; then
+            systemctl enable NetworkManager.service
+            echo "    NetworkManager enabled"
+        fi
+        
+        # Enable libvirt for virtualization if not already enabled
+        if ! systemctl is-enabled libvirtd.service &> /dev/null; then
+            systemctl enable libvirtd.service
+            echo "    libvirtd enabled (for virtualization)"
+        fi
+    fi
+    
+    echo ""
+    echo "==> SoloLinux Hyprland installation complete!"
+    echo ""
+    echo "NOTES:"
+    echo "  - Configuration files have been installed to /etc/skel/"
+    echo "  - Existing users: Copy configs from /etc/skel/.config/ to ~/.config/"
+    echo "  - New users will automatically receive these configs"
+    echo "  - GRUB theme has been configured and will appear on next boot"
+    echo "  - Original os-release backed up (if it existed)"
+    echo ""
+    echo "RECOMMENDED NEXT STEPS:"
+    echo "  1. Copy configs to your home directory:"
+    echo "     cp -r /etc/skel/.config/* ~/.config/"
+    echo "     cp /etc/skel/.zshrc ~/.zshrc"
+    echo "  2. Restart your session to apply all changes"
+    echo "  3. Configure your display manager to use ly (if desired)"
+    echo ""
+}
+
+post_upgrade() {
+    echo "==> Upgrading SoloLinux Hyprland configuration..."
+    
+    # Check if GRUB theme needs updating
+    if [ -d /usr/share/grub/themes/SoloLinux_grub ]; then
+        if command -v grub-mkconfig &> /dev/null; then
+            echo "    Regenerating GRUB configuration..."
+            grub-mkconfig -o /boot/grub/grub.cfg
+        fi
+    fi
+    
+    echo ""
+    echo "==> SoloLinux Hyprland upgraded!"
+    echo ""
+    echo "NOTES:"
+    echo "  - Updated configs are in /etc/skel/"
+    echo "  - Existing user configs NOT modified (to preserve your changes)"
+    echo "  - Review /etc/skel/ and manually merge changes if desired"
+    echo ""
+}
+
+pre_remove() {
+    echo "==> Preparing to remove SoloLinux Hyprland configuration..."
+    
+    # Restore GRUB config
+    if [ -f /etc/default/grub.bak ]; then
+        echo "    Restoring original GRUB configuration..."
+        cp /etc/default/grub.bak /etc/default/grub
+        
+        if command -v grub-mkconfig &> /dev/null; then
+            grub-mkconfig -o /boot/grub/grub.cfg
+            echo "    GRUB configuration restored"
+        fi
+    fi
+}
+
+post_remove() {
+    echo "==> SoloLinux Hyprland configuration removed"
+    echo ""
+    echo "NOTES:"
+    echo "  - Configuration files in /etc/skel/ have been removed"
+    echo "  - Your personal configs in ~/ were NOT removed"
+    echo "  - Original os-release restored (if backup existed)"
+    echo "  - GRUB theme removed and config restored"
+    echo ""
+}
+# #!/bin/bash
+#
+# post_install() {
+#     echo "==> Setting up SoloLinux Hyprland configuration..."
+#
+#     # Backup original os-release if it exists and hasn't been backed up
+#     if [ -f /etc/os-release.pacsave ]; then
+#         echo "    Original os-release already backed up at /etc/os-release.pacsave"
+#     fi
+#
+#     # Configure GRUB theme
+#     if [ -d /usr/share/grub/themes/SoloLinux_grub ]; then
+#         echo "==> Configuring GRUB theme..."
+#
+#         # Backup GRUB config if not already backed up
+#         if [ ! -f /etc/default/grub.bak ]; then
+#             cp /etc/default/grub /etc/default/grub.bak
+#             echo "    GRUB config backed up to /etc/default/grub.bak"
+#         fi
+#
+#         # Check if theme line already exists
+#         if ! grep -q "GRUB_THEME=" /etc/default/grub; then
+#             echo 'GRUB_THEME="/usr/share/grub/themes/SoloLinux_grub/theme.txt"' >> /etc/default/grub
+#             echo "    GRUB theme configured"
+#         else
+#             # Update existing theme line
+#             sed -i 's|^GRUB_THEME=.*|GRUB_THEME="/usr/share/grub/themes/SoloLinux_grub/theme.txt"|' /etc/default/grub
+#             echo "    GRUB theme updated"
+#         fi
+#
+#         # Regenerate GRUB config
+#         if command -v grub-mkconfig &> /dev/null; then
+#             echo "    Regenerating GRUB configuration..."
+#             grub-mkconfig -o /boot/grub/grub.cfg
+#             echo "    GRUB configuration updated"
+#         else
+#             echo "    WARNING: grub-mkconfig not found. Please run 'sudo grub-mkconfig -o /boot/grub/grub.cfg' manually"
+#         fi
+#     fi
+#
+#     # Enable necessary services
+#     echo "==> Enabling system services..."
+#
+#     if command -v systemctl &> /dev/null; then
+#         # Enable NetworkManager if not already enabled
+#         if ! systemctl is-enabled NetworkManager.service &> /dev/null; then
+#             systemctl enable NetworkManager.service
+#             echo "    NetworkManager enabled"
+#         fi
+#
+#         # Enable libvirt for virtualization if not already enabled
+#         if ! systemctl is-enabled libvirtd.service &> /dev/null; then
+#             systemctl enable libvirtd.service
+#             echo "    libvirtd enabled (for virtualization)"
+#         fi
+#     fi
+#
+#     echo ""
+#     echo "==> SoloLinux Hyprland installation complete!"
+#     echo ""
+#     echo "NOTES:"
+#     echo "  - Configuration files have been installed to /etc/skel/"
+#     echo "  - Existing users: Copy configs from /etc/skel/.config/ to ~/.config/"
+#     echo "  - New users will automatically receive these configs"
+#     echo "  - GRUB theme has been configured and will appear on next boot"
+#     echo "  - Original os-release backed up (if it existed)"
+#     echo ""
+#     echo "RECOMMENDED NEXT STEPS:"
+#     echo "  1. Copy configs to your home directory:"
+#     echo "     cp -r /etc/skel/.config/* ~/.config/"
+#     echo "     cp /etc/skel/.zshrc ~/.zshrc"
+#     echo "  2. Restart your session to apply all changes"
+#     echo "  3. Configure your display manager to use ly (if desired)"
+#     echo ""
+# }
+#
+# post_upgrade() {
+#     echo "==> Upgrading SoloLinux Hyprland configuration..."
+#
+#     # Check if GRUB theme needs updating
+#     if [ -d /usr/share/grub/themes/SoloLinux_grub ]; then
+#         if command -v grub-mkconfig &> /dev/null; then
+#             echo "    Regenerating GRUB configuration..."
+#             grub-mkconfig -o /boot/grub/grub.cfg
+#         fi
+#     fi
+#
+#     echo ""
+#     echo "==> SoloLinux Hyprland upgraded!"
+#     echo ""
+#     echo "NOTES:"
+#     echo "  - Updated configs are in /etc/skel/"
+#     echo "  - Existing user configs NOT modified (to preserve your changes)"
+#     echo "  - Review /etc/skel/ and manually merge changes if desired"
+#     echo ""
+# }
+#
+# pre_remove() {
+#     echo "==> Preparing to remove SoloLinux Hyprland configuration..."
+#
+#     # Restore GRUB config
+#     if [ -f /etc/default/grub.bak ]; then
+#         echo "    Restoring original GRUB configuration..."
+#         cp /etc/default/grub.bak /etc/default/grub
+#
+#         if command -v grub-mkconfig &> /dev/null; then
+#             grub-mkconfig -o /boot/grub/grub.cfg
+#             echo "    GRUB configuration restored"
+#         fi
+#     fi
+# }
+#
+# post_remove() {
+#     echo "==> SoloLinux Hyprland configuration removed"
+#     echo ""
+#     echo "NOTES:"
+#     echo "  - Configuration files in /etc/skel/ have been removed"
+#     echo "  - Your personal configs in ~/ were NOT removed"
+#     echo "  - Original os-release restored (if backup existed)"
+#     echo "  - GRUB theme removed and config restored"
+#     echo ""
+# }

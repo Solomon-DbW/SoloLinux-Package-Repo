@@ -1,0 +1,221 @@
+# Maintainer: Solomon-DbW <youremail@domain.com>
+pkgname=sololinux-hyprland
+pkgver=1.0.0
+pkgrel=1
+pkgdesc="Installs the SoloLinux config files and packages for Hyprland"
+arch=('any')
+url="https://github.com/Solomon-DbW/SoloLinux_GUI"
+license=('GPL-3.0-or-later')
+depends=(
+    'licenses'
+    'hyprland'
+    'waybar'
+    'brightnessctl'
+    'ttf-jetbrains-mono-nerd'
+    'networkmanager'
+    'rofi'
+    'nvim'
+    'emacs'
+    'kitty'
+    'virt-manager'
+    'qemu-full'
+    'virt-viewer'
+    'dnsmasq'
+    'bridge-utils'
+    'libguestfs'
+    'yazi'
+    'starship'
+    'fastfetch'
+)
+makedepends=('git')
+install=sololinux-hyprland.install
+source=("git+https://github.com/Solomon-DbW/SoloLinux_GUI.git")
+sha256sums=('SKIP')
+backup=('etc/os-release')
+optdepends=('grub: for GRUB bootloader theme support')
+
+package() {
+    cd "$srcdir/SoloLinux_GUI"
+    
+    # Create target directories
+    install -d "$pkgdir/etc/skel/.config"
+    install -d "$pkgdir/usr/share/grub/themes"
+    
+    # Copy config directories to /etc/skel/.config/
+    for dir in hypr waybar rofi nvim emacs fastfetch; do
+        if [ -d "$dir" ]; then
+            cp -r "$dir" "$pkgdir/etc/skel/.config/"
+        fi
+    done
+    
+    # Copy individual config files
+    if [ -f "ly_config.ini" ]; then
+        install -Dm644 ly_config.ini "$pkgdir/etc/skel/.config/ly_config.ini"
+    fi
+    
+    if [ -f "starship.toml" ]; then
+        install -Dm644 starship.toml "$pkgdir/etc/skel/.config/starship.toml"
+    fi
+    
+    # Copy zshrc to home directory
+    if [ -f "zshrcfile" ]; then
+        install -Dm644 zshrcfile "$pkgdir/etc/skel/.zshrc"
+    fi
+    
+    # Copy GRUB theme
+    if [ -d "SoloLinux_grub" ]; then
+        cp -r SoloLinux_grub "$pkgdir/usr/share/grub/themes/"
+    fi
+    
+    # Install os-release (will be backed up due to backup array)
+    if [ -f "os-release" ]; then
+        install -Dm644 os-release "$pkgdir/etc/os-release"
+    fi
+}
+
+# # Maintainer: Solomon-DbW <youremail@domain.com>
+# pkgname=sololinux-hyprland
+# pkgver=1.0.0
+# pkgrel=1
+# pkgdesc="Installs the SoloLinux config files and packages for Hyprland"
+# arch=('any')
+# url="https://github.com/Solomon-DbW/SoloLinux_GUI"
+# license=('GPL-3.0-or-later')
+# depends=(
+#     'licenses'
+#     'hyprland'
+#     'waybar'
+#     'brightnessctl'
+#     'ttf-jetbrains-mono-nerd'
+#     'networkmanager'
+#     'rofi'
+#     'nvim'
+#     'emacs'
+#     'kitty'
+#     'virt-manager'
+#     'qemu-full'
+#     'virt-viewer'
+#     'dnsmasq'
+#     'bridge-utils'
+#     'libguestfs'
+#     'yazi'
+#     'starship'
+#     'fastfetch'
+# )
+# makedepends=('git')
+# source=("git+https://github.com/Solomon-DbW/SoloLinux_GUI.git")
+# sha256sums=('SKIP')
+# backup=('etc/os-release')
+#
+# package() {
+#     cd "$srcdir/SoloLinux_GUI"
+#
+#     # Create target directories
+#     install -d "$pkgdir/etc/skel/.config"
+#     install -d "$pkgdir/usr/share/grub/themes"
+#
+#     # Copy config directories to /etc/skel/.config/
+#     for dir in hypr waybar rofi nvim emacs fastfetch; do
+#         if [ -d "$dir" ]; then
+#             cp -r "$dir" "$pkgdir/etc/skel/.config/"
+#         fi
+#     done
+#
+#     # Copy individual config files
+#     if [ -f "ly_config.ini" ]; then
+#         install -Dm644 ly_config.ini "$pkgdir/etc/skel/.config/ly_config.ini"
+#     fi
+#
+#     if [ -f "starship.toml" ]; then
+#         install -Dm644 starship.toml "$pkgdir/etc/skel/.config/starship.toml"
+#     fi
+#
+#     # Copy zshrc to home directory
+#     if [ -f "zshrcfile" ]; then
+#         install -Dm644 zshrcfile "$pkgdir/etc/skel/.zshrc"
+#     fi
+#
+#     # Copy GRUB theme
+#     if [ -d "SoloLinux_grub" ]; then
+#         cp -r SoloLinux_grub "$pkgdir/usr/share/grub/themes/"
+#     fi
+#
+#     # Install os-release (will be backed up due to backup array)
+#     if [ -f "os-release" ]; then
+#         install -Dm644 os-release "$pkgdir/etc/os-release"
+#     fi
+# }
+
+# # Maintainer: Solomon-DbW <youremail@domain.com>
+# pkgname=sololinux-hyprland
+# pkgver=1.0.0
+# pkgrel=1
+# pkgdesc="Installs the SoloLinux config files and packages for Hyprland"
+# arch=('any')
+# url="https://github.com/Solomon-DbW/SoloLinux_GUI"
+# license=('GPL-3.0-or-later')
+# depends=(
+#     'licenses'
+#     'hyprland'
+#     'waybar'
+#     'brightnessctl'
+#     'ttf-jetbrains-mono-nerd'
+#     'networkmanager'
+#     'rofi'
+#     'nvim'
+#     'emacs'
+#     'kitty'
+#     'virt-manager'
+#     'qemu-full'
+#     'virt-viewer'
+#     'dnsmasq'
+#     'bridge-utils'
+#     'libguestfs'
+#     'yazi'
+#     'starship'
+#     'fastfetch'
+# )
+# makedepends=('git')
+# install=sololinux-hyprland.install
+# source=("git+https://github.com/Solomon-DbW/SoloLinux_GUI.git")
+# sha256sums=('SKIP')
+# backup=('etc/os-release' 'etc/default/grub')
+#
+# package() {
+#     cd "$srcdir/SoloLinux_GUI"
+#
+#     # Create target directories
+#     install -d "$pkgdir/etc/skel/.config"
+#     install -d "$pkgdir/usr/share/grub/themes"
+#
+#     # Copy config directories to /etc/skel/.config/
+#     for dir in hypr waybar rofi nvim emacs fastfetch; do
+#         if [ -d "$dir" ]; then
+#             cp -r "$dir" "$pkgdir/etc/skel/.config/"
+#         fi
+#     done
+#
+#     # Copy individual config files
+#     if [ -f "ly_config.ini" ]; then
+#         install -Dm644 ly_config.ini "$pkgdir/etc/skel/.config/ly_config.ini"
+#     fi
+#
+#     if [ -f "starship.toml" ]; then
+#         install -Dm644 starship.toml "$pkgdir/etc/skel/.config/starship.toml"
+#     fi
+#
+#     # Copy zshrc to home directory
+#     if [ -f "zshrcfile" ]; then
+#         install -Dm644 zshrcfile "$pkgdir/etc/skel/.zshrc"
+#     fi
+#
+#     # Copy GRUB theme
+#     if [ -d "SoloLinux_grub" ]; then
+#         cp -r SoloLinux_grub "$pkgdir/usr/share/grub/themes/"
+#     fi
+#
+#     # Install os-release (will be backed up due to backup array)
+#     if [ -f "os-release" ]; then
+#         install -Dm644 os-release "$pkgdir/etc/os-release"
+#     fi
+# }
